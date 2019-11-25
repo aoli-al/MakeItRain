@@ -15,7 +15,7 @@ public class UpdateBloodPos : MonoBehaviour
         ParticleSystem.ShapeModule editableShape = ps.shape;
         var pos = -objectToFollow.position;
         editableShape.position = new Vector3(pos.x, y, pos.z);
-        Debug.Log(objectToFollow.position);
-        Debug.Log(transform.position);
+        // Debug.Log(objectToFollow.position);
+        // Debug.Log(transform.position);
     }
 }
