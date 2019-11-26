@@ -16,7 +16,7 @@ public class UpdateBloodDecayPos : MonoBehaviour
     }
 
     void Awake() {
-        objectToFollow = GameObject.Find("CylinderPH");
+        objectToFollow = GameObject.Find("Cylinder");
         initObjectPos = objectToFollow.transform.position;
     }
 

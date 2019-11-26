@@ -11,6 +11,10 @@ public class DisplayScript : MonoBehaviour
             Display.displays[1].Activate();
         if (Display.displays.Length > 2)
             Display.displays[2].Activate();
+        if (Display.displays.Length > 3)
+            Display.displays[3].Activate();
+        if (Display.displays.Length > 4)
+            Display.displays[4].Activate();
 
     }
 
