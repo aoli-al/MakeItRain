@@ -1,10 +1,11 @@
-﻿#if UNITY_EDITOR
-namespace DecalSystem {
+﻿namespace DecalSystem {
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+#if UNITY_EDITOR
     using UnityEditor;
     using UnityEditor.SceneManagement;
+#endif
     using UnityEngine;
 
     static class DecalUtils {
@@ -70,6 +71,7 @@ namespace DecalSystem {
         }
 
 
+#if UNITY_EDITOR
         public static void SetDirty(Decal decal) {
             if (decal.gameObject.scene.IsValid()) {
                 if (!EditorApplication.isPlaying) EditorSceneManager.MarkSceneDirty( decal.gameObject.scene );
@@ -77,7 +79,7 @@ namespace DecalSystem {
                 EditorUtility.SetDirty( decal.gameObject );
             }
         }
-
+#endif
 
         public static void FixRatio(Decal decal, ref Vector3 oldScale) {
             var transform = decal.transform;
@@ -111,4 +113,3 @@ namespace DecalSystem {
 
     }
 }
-#endif
