@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR.Extras;
 using DecalSystem;
+using UnityEngine.Networking;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+
+
 
 public class SceneHandler : MonoBehaviour
 {
@@ -12,6 +20,18 @@ public class SceneHandler : MonoBehaviour
     public GameObject blood;
     public GameObject bloodStatic;
     public GameObject objectToFollow;
+    public GameObject bloodRipple;
+    public GameObject Text1;
+    public GameObject Text2;
+    public GameObject Text3;
+    public GameObject Text4;
+    public GameObject Text5;
+    public GameObject Text6;
+    public GameObject Text7;
+    public GameObject Text8;
+    int triggerCount = 0;
+
+
     // Start is called before the first frame update
 
     void Start()
@@ -20,6 +40,8 @@ public class SceneHandler : MonoBehaviour
         laserPointer.PointerIn += PointerInside;
         laserPointer.PointerOut += PointerOutside;
         laserPointer.PointerClick += PointerClick;
+
+
     }
 
     // Update is called once per frame
@@ -29,25 +51,73 @@ public class SceneHandler : MonoBehaviour
 
     public void PointerClick(object sender, PointerEventArgs e)
     {
-        Debug.Log("Button was clicked");
-        previousTransform = e.target;
-        shouldDraw = true;
-        var hits = Physics.RaycastAll(transform.position, transform.forward);
-        foreach (var hit in hits) {
-            if (new List<string>() {"Cylinder", "Back"}.Contains(hit.collider.gameObject.name)) {
-                if (hit.collider.gameObject.name == "Cylinder")
-                {
-                    var a = Instantiate(blood, hit.point, Quaternion.Euler(0, 0, -90));
-                    DecalSystem.DecalBuilder.Build(a.GetComponent<Decal>());
-                    Debug.Log(objectToFollow);
-                    a.GetComponent<UpdateBloodDecayPos>().shouldUpdate = true;
-                } else {
-                    var a = Instantiate(bloodStatic, hit.point, Quaternion.Euler(0, 0, -90));
+        triggerCount += 1;
+
+        // TRIGGER WILL ENABLE TEXT
+        if (triggerCount == 1) {
+            Text1.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 3) {
+            Text2.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 5) {
+            Text3.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 7) {
+            Text4.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 8) {
+            Text4.GetComponent<Renderer>().enabled = false;
+            Text5.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 10) {
+            Text6.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 12) {
+            Text7.GetComponent<Renderer>().enabled = true;
+        } else if (triggerCount == 14) {
+            Text8.GetComponent<Renderer>().enabled = true;
+        }
+       
+        // TRIGGER WILL ENABLE GUNSHOT
+        else {
+                Text1.GetComponent<Renderer>().enabled = false;
+                Text2.GetComponent<Renderer>().enabled = false;
+                Text3.GetComponent<Renderer>().enabled = false;
+                Text4.GetComponent<Renderer>().enabled = false;
+                Text5.GetComponent<Renderer>().enabled = false;
+                Text6.GetComponent<Renderer>().enabled = false;
+                Text7.GetComponent<Renderer>().enabled = false;
+                Text8.GetComponent<Renderer>().enabled = false;
+
+            Debug.Log("Button was clicked");
+            previousTransform = e.target;
+            shouldDraw = true;
+            int outHostId;
+            int outConnectionId;
+            int outChannelId;
+            byte[] buffer = new byte[1024];
+            int bufferSize = 1024;
+            int receiveSize;
+            byte error;
+            
+            var hits = Physics.RaycastAll(transform.position, transform.forward);
+            foreach (var hit in hits) {
+                if (new List<string>() {"Cylinder", "Back"}.Contains(hit.collider.gameObject.name)) {
+                    if (hit.collider.gameObject.name == "Cylinder")
+                    {
+                        var a = Instantiate(blood, hit.point, Quaternion.Euler(0, 0, -90));
+                        DecalSystem.DecalBuilder.Build(a.GetComponent<Decal>());
+                        Debug.Log(objectToFollow);
+                        a.GetComponent<UpdateBloodDecayPos>().shouldUpdate = true;
+                    } else {
+                        var a = Instantiate(bloodStatic, hit.point, Quaternion.Euler(0, 0, -90));
+                    }
                 }
             }
+            var p = bloodRipple.GetComponent<ParticleSystem>();
+            p.emission.SetBurst(0, new ParticleSystem.Burst(0.0f, 5, 10, 0, 0.1f));
+            var endPoint = new IPEndPoint(IPAddress.Parse("192.168.0.237"), 2001);
+            var client = new UdpClient();
+            client.Send(Encoding.UTF8.GetBytes("0"), 1, endPoint);
+            // plane.transform.position = hit.transform.position;
+            // plane.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         }
-        // plane.transform.position = hit.transform.position;
-        // plane.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+
     }
 
     public void PointerInside(object sender, PointerEventArgs e)

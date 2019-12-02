@@ -26,7 +26,7 @@ public class UpdatePlayer : MonoBehaviour
 		transform.position = pos;
 		
 		lastPose = objectToFollow.position;
-		Debug.Log(transform.position);
+		// Debug.Log(transform.position);
         //transform.position = new Vector3(objectToFollow.position.x, transform.position.y, objectToFollow.position.z);
     }
 }
