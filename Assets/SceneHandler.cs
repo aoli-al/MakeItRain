@@ -9,6 +9,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Linq;
+using System;
 
 
 
@@ -29,7 +31,14 @@ public class SceneHandler : MonoBehaviour
     public GameObject Text6;
     public GameObject Text7;
     public GameObject Text8;
+
+    public GameObject CameraFloor;
+    public GameObject CameraBack;
     int triggerCount = 0;
+
+    bool Calibration = false;
+
+    private List<Vector3> PosList = new List<Vector3>();
 
 
     // Start is called before the first frame update
@@ -51,7 +60,21 @@ public class SceneHandler : MonoBehaviour
 
     public void PointerClick(object sender, PointerEventArgs e)
     {
+        if (PosList.Count < 4) {
+            PosList.Add(objectToFollow.transform.position);
+        } else if (! Calibration) {
+            Calibration = true;
+            var nx = (PosList[0].x + PosList[2].x) / 2;
+            var ny = (PosList[0].z + PosList[2].z) / 2;
+            CameraFloor.transform.position = new Vector3(nx, 7.5f, ny);
+            var dx = (PosList[1].x - PosList[0].x);
+            var dz = (PosList[1].z - PosList[0].z);
+            var angle = Math.Atan(dz/dx) * (180/Math.PI);
+            CameraFloor.transform.rotation = Quaternion.Euler(new Vector3(90, -90, (float) angle));
+        }
+
         triggerCount += 1;
+
 
         // TRIGGER WILL ENABLE TEXT
         if (triggerCount == 1) {
@@ -72,7 +95,7 @@ public class SceneHandler : MonoBehaviour
         } else if (triggerCount == 14) {
             Text8.GetComponent<Renderer>().enabled = true;
         }
-       
+
         // TRIGGER WILL ENABLE GUNSHOT
         else {
                 Text1.GetComponent<Renderer>().enabled = false;
@@ -94,7 +117,7 @@ public class SceneHandler : MonoBehaviour
             int bufferSize = 1024;
             int receiveSize;
             byte error;
-            
+
             var hits = Physics.RaycastAll(transform.position, transform.forward);
             foreach (var hit in hits) {
                 if (new List<string>() {"Cylinder", "Back"}.Contains(hit.collider.gameObject.name)) {
